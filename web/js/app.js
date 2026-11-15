@@ -31,7 +31,7 @@ class CulpritApplication {
   }
 
   // ========================================================================
-  // API CLIENT METHODS
+  // API CLIENT METHODS WITH AUTOMATIC SERVERLESS / CLIENT-ENGINE FALLBACK
   // ========================================================================
   async apiGet(path) {
     try {
@@ -39,8 +39,8 @@ class CulpritApplication {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch (err) {
-      console.error(`[API ERROR] GET ${path}:`, err);
-      return null;
+      console.warn(`[API] Remote call to ${path} failed or running in serverless mode. Falling back to local engine:`, err.message);
+      return this.localFallback(path, 'GET');
     }
   }
 
@@ -54,9 +54,74 @@ class CulpritApplication {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch (err) {
-      console.error(`[API ERROR] POST ${path}:`, err);
-      return null;
+      console.warn(`[API] Remote call to ${path} failed or running in serverless mode. Falling back to local engine:`, err.message);
+      return this.localFallback(path, 'POST', payload);
     }
+  }
+
+  localFallback(path, method, payload = {}) {
+    if (!window.localForensicEngine) return null;
+    const le = window.localForensicEngine;
+
+    if (path === '/api/cases') return le.getCases();
+    if (path === '/api/health') return { status: "ONLINE", system: "WHO IS THE CULPRIT? Forensic Engine (Vercel Serverless / Client Engine)", version: "2.0-VERCEL" };
+    if (path === '/api/cpp-code') {
+      return {
+        merge_sort: "// C++17 Divide-and-Conquer Merge Sort for Suspect Prioritization (O(N log N))\nvoid mergeSort(std::vector<Suspect>& arr, int left, int right) {\n    if (left >= right) return;\n    int mid = left + (right - left) / 2;\n    mergeSort(arr, left, mid);\n    mergeSort(arr, mid + 1, right);\n    merge(arr, left, mid, right);\n}\n\nvoid merge(std::vector<Suspect>& arr, int left, int mid, int right) {\n    std::vector<Suspect> L(arr.begin() + left, arr.begin() + mid + 1);\n    std::vector<Suspect> R(arr.begin() + mid + 1, arr.begin() + right + 1);\n    int i = 0, j = 0, k = left;\n    while (i < L.size() && j < R.size()) {\n        if (L[i].evidenceScore >= R[j].evidenceScore) arr[k++] = L[i++];\n        else arr[k++] = R[j++];\n    }\n    while (i < L.size()) arr[k++] = L[i++];\n    while (j < R.size()) arr[k++] = R[j++];\n}",
+        backtracking: "// C++17 Backtracking Constraint Satisfaction Elimination Engine\nvoid backtrackSolve(const vector<Suspect>& suspects, size_t sIdx,\n                    const vector<Clue>& clues, size_t cIdx,\n                    vector<Suspect>& solutions) {\n    if (sIdx >= suspects.size()) return;\n    const auto& cand = suspects[sIdx];\n    if (cIdx >= clues.size()) {\n        solutions.push_back(cand);\n        backtrackSolve(suspects, sIdx + 1, clues, 0, solutions);\n        return;\n    }\n    if (evaluateConstraint(cand, clues[cIdx])) {\n        backtrackSolve(suspects, sIdx, clues, cIdx + 1, solutions);\n    } else {\n        logBranchPruned(cand, clues[cIdx]);\n        backtrackSolve(suspects, sIdx + 1, clues, 0, solutions);\n    }\n}",
+        bfs: "// C++17 Adjacency List Breadth-First Search (O(V + E))\nBFSResult runBFS(const std::string& startId) {\n    std::queue<std::string> q;\n    std::unordered_set<std::string> visited;\n    q.push(startId); visited.insert(startId);\n    distance[startId] = 0;\n    while (!q.empty()) {\n        std::string u = q.front(); q.pop();\n        for (const auto& edge : adjList[u]) {\n            std::string v = edge.targetId;\n            if (visited.find(v) == visited.end()) {\n                visited.insert(v);\n                distance[v] = distance[u] + 1;\n                parent[v] = u;\n                q.push(v);\n            }\n        }\n    }\n    return result;\n}",
+        kmp: "// C++17 Knuth-Morris-Pratt (KMP) Linear-Time String Matching (O(N + M))\nstd::vector<int> computeLps(const std::string& pat) {\n    int m = pat.length(), len = 0, i = 1;\n    std::vector<int> lps(m, 0);\n    while (i < m) {\n        if (pat[i] == pat[len]) { len++; lps[i++] = len; }\n        else if (len != 0) len = lps[len - 1];\n        else lps[i++] = 0;\n    }\n    return lps;\n}\n\nvoid kmpSearch(const std::string& txt, const std::string& pat) {\n    auto lps = computeLps(pat);\n    int i = 0, j = 0;\n    while (i < txt.length()) {\n        if (pat[j] == txt[i]) { i++; j++; }\n        if (j == pat.length()) {\n            recordMatch(i - j, i - 1);\n            j = lps[j - 1];\n        } else if (i < txt.length() && pat[j] != txt[i]) {\n            if (j != 0) j = lps[j - 1];\n            else i++;\n        }\n    }\n}"
+      };
+    }
+
+    if (path.startsWith('/api/cases/')) {
+      const parts = path.split('/');
+      const caseId = parts[3];
+      const subRoute = parts.slice(4).join('/');
+
+      if (!subRoute) return le.getCase(caseId);
+      if (subRoute === 'graph') return le.getGraphData(caseId);
+      if (subRoute === 'memory') return le.getMemory(caseId);
+      if (subRoute === 'algorithms/sort') return le.runMergeSort(caseId);
+      if (subRoute === 'algorithms/backtracking') return le.runBacktracking(caseId);
+      if (subRoute === 'algorithms/bfs') return le.runBFS(caseId, payload.startNode || `VICTIM_${caseId}`);
+      if (subRoute === 'algorithms/dfs') return le.runBFS(caseId, payload.startNode || `VICTIM_${caseId}`);
+      if (subRoute === 'algorithms/kmp') {
+        const stmt = (le.getCase(caseId).witnessStatements || [])[0];
+        return le.runKMP(stmt ? stmt.statementText : "", payload.pattern || "dark grey sedan");
+      }
+      if (subRoute === 'algorithms/search') {
+        const cf = le.getCase(caseId);
+        const q = (payload.query || '').toLowerCase();
+        if (payload.target === 'evidence') {
+          const matches = cf.evidenceRecords.filter(e => e.name.toLowerCase().includes(q) || e.category.toLowerCase().includes(q));
+          return { algorithmName: 'Linear Search', totalComparisons: cf.evidenceRecords.length, matches, traceLogs: [] };
+        } else {
+          const matches = cf.suspects.filter(s => s.fullName.toLowerCase().includes(q) || s.occupation.toLowerCase().includes(q));
+          return { algorithmName: 'Linear Search', totalComparisons: cf.suspects.length, matches, traceLogs: [] };
+        }
+      }
+      if (subRoute === 'algorithms/shortest-path') {
+        return { fromId: payload.fromId, toId: payload.toId, path: le.getShortestPath(caseId, payload.fromId, payload.toId), pathLength: 2 };
+      }
+      if (subRoute === 'solve') {
+        const ranking = le.runMergeSort(caseId);
+        const bt = le.runBacktracking(caseId);
+        const bfs = le.runBFS(caseId, `VICTIM_${caseId}`);
+        return {
+          caseId: caseId,
+          caseTitle: le.getCase(caseId).caseTitle,
+          investigator: le.getCase(caseId).assignedInvestigator,
+          rankingResult: ranking,
+          clueMatchingResult: bt,
+          primaryNetworkBfs: bfs,
+          primaryPersonsOfInterest: bt.matchingSuspects,
+          executiveForensicSummary: `COMPREHENSIVE FORENSIC SYNTHESIS: Investigation evaluated ${ranking.sortedSuspects.length} suspects and case evidence records. Merge Sort prioritized ${ranking.sortedSuspects[0].fullName} as prime suspect (${ranking.sortedSuspects[0].evidenceRelevanceScore}%). CSP Backtracking identified ${bt.matchingSuspects.length} candidate(s) strictly satisfying 100% of the empirical clues.`,
+          legalDisclaimer: "EDUCATIONAL FORENSIC SIMULATION: Matching candidates represent persons of high investigative interest who satisfy all empirical constraints."
+        };
+      }
+    }
+    return null;
   }
 
   // ========================================================================
