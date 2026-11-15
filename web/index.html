@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WHO IS THE CULPRIT? | Police Forensic Investigation & Algorithmic Analysis System</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="badge-police">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/>
+          <path d="M12 8v5"/>
+          <circle cx="12" cy="16" r="1"/>
+        </svg>
+      </div>
+      <div class="app-branding">
+        <div class="app-title">WHO IS THE CULPRIT?</div>
+        <div class="app-subtitle">DIRECTORATE OF FORENSIC CRIMINOLOGY &bull; ALGORITHMIC INVESTIGATION SYSTEM</div>
+      </div>
+    </div>
+
+    <!-- Active Case Selector -->
+    <div class="header-center">
+      <div class="case-selector-box">
+        <span class="label">ACTIVE CASE:</span>
+        <select id="caseSelector" onchange="window.culpritApp.switchCase(this.value)">
+          <!-- Options dynamically injected -->
+        </select>
+        <span id="caseStatusBadge" class="status-pill status-active">ACTIVE INQUIRY</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="system-telemetry">
+        <span class="telemetry-item"><span class="dot-online"></span> C++17 ENGINE: <strong>ONLINE</strong></span>
+        <span class="telemetry-item">PORT: <strong>8080</strong></span>
+        <span class="telemetry-item" id="systemClock">22:00:00 IST</span>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="window.culpritApp.openSolveModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        RUN CASE SOLVER
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Application Wrapper -->
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="section-title">FORENSIC MODULES</div>
+        <nav class="nav-menu">
+          <button class="nav-item active" data-tab="tab-dashboard" onclick="window.culpritApp.switchTab('tab-dashboard')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="9"/>
+              <rect x="14" y="3" width="7" height="5"/>
+              <rect x="14" y="12" width="7" height="9"/>
+              <rect x="3" y="16" width="7" height="5"/>
+            </svg>
+            Dashboard
+          </button>
+          <button class="nav-item" data-tab="tab-cases" onclick="window.culpritApp.switchTab('tab-cases')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+            </svg>
+            Case Management
+          </button>
+          <button class="nav-item" data-tab="tab-suspects" onclick="window.culpritApp.switchTab('tab-suspects')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            Suspects & Matrix
+          </button>
+          <button class="nav-item" data-tab="tab-evidence" onclick="window.culpritApp.switchTab('tab-evidence')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+            Evidence Board
+          </button>
+          <button class="nav-item" data-tab="tab-witnesses" onclick="window.culpritApp.switchTab('tab-witnesses')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              <line x1="9" y1="10" x2="15" y2="10"/>
+            </svg>
+            Witness Statements & KMP
+          </button>
+          <button class="nav-item" data-tab="tab-graph" onclick="window.culpritApp.switchTab('tab-graph')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="6" cy="6" r="3"/>
+              <circle cx="18" cy="18" r="3"/>
+              <circle cx="18" cy="6" r="3"/>
+              <circle cx="6" cy="18" r="3"/>
+              <line x1="8.59" y1="8.59" x2="15.42" y2="15.42"/>
+              <line x1="18" y1="9" x2="18" y2="15"/>
+              <line x1="9" y1="18" x2="15" y2="18"/>
+            </svg>
+            Relationship Network
+          </button>
+          <button class="nav-item" data-tab="tab-algorithms" onclick="window.culpritApp.switchTab('tab-algorithms')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="4 17 10 11 4 5"/>
+              <line x1="12" y1="19" x2="20" y2="19"/>
+            </svg>
+            DSA Engine Console
+          </button>
+          <button class="nav-item" data-tab="tab-cpp-code" onclick="window.culpritApp.switchTab('tab-cpp-code')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 18 22 12 16 6"/>
+              <polyline points="8 6 2 12 8 18"/>
+            </svg>
+            C++ Architecture & Code
+          </button>
+          <button class="nav-item" data-tab="tab-report" onclick="window.culpritApp.switchTab('tab-report')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            Investigation Report (PDF)
+          </button>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="alert-box">
+          <div class="alert-title">LEGAL NOTICE</div>
+          <div class="alert-body">
+            Fictional educational simulation only. All suspects, crimes and evidence are fictional. No AI/ML or facial recognition utilized.
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+      <!-- ============================================================== -->
+      <!-- TAB 1: DASHBOARD -->
+      <!-- ============================================================== -->
+      <section id="tab-dashboard" class="tab-pane active">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">CRIME INVESTIGATION COMMAND DASHBOARD</h1>
+            <p class="view-subtitle">Real-time telemetry, evidentiary posture, and algorithmic suspect rankings.</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn btn-secondary" onclick="window.culpritApp.refreshCurrentCase()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+              </svg>
+              Refresh Case Data
+            </button>
+          </div>
+        </div>
+
+        <!-- 6 Metrics Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon icon-cases">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">TOTAL CASES ACTIVE</div>
+              <div class="stat-value" id="statTotalCases">3</div>
+              <div class="stat-sub">1 High Priority &bull; 2 In Triage</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon icon-suspects">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">SUSPECTS REGISTERED</div>
+              <div class="stat-value" id="statTotalSuspects">5</div>
+              <div class="stat-sub" id="statSuspectsSub">1 Prime &bull; 2 Persons of Interest</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon icon-evidence">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">EVIDENCE COLLECTED</div>
+              <div class="stat-value" id="statTotalEvidence">8</div>
+              <div class="stat-sub">Physical, Digital & Documentary</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon icon-witnesses">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">WITNESS DEPOSITIONS</div>
+              <div class="stat-value" id="statTotalWitnesses">4</div>
+              <div class="stat-sub">Indexed via KMP Search</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon icon-clues">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">EMPIRICAL CASE CLUES</div>
+              <div class="stat-value" id="statTotalClues">6</div>
+              <div class="stat-sub">Constraint Backtracking Ready</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon icon-solved">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">CASE SOLVE STATUS</div>
+              <div class="stat-value text-accent" id="statSolvedStatus">SOLVED</div>
+              <div class="stat-sub">1 Matching Culprit Hypothesis</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard Two-Column Grid -->
+        <div class="dashboard-grid">
+          <!-- Left Column: Active Case Spotlight & Suspect Leaderboard -->
+          <div class="grid-col-left">
+            <!-- Active Case File Banner -->
+            <div class="dossier-card mb-4">
+              <div class="dossier-header">
+                <div class="dossier-badge">PRIMARY CASE DOSSIER</div>
+                <div class="case-id-tag" id="dashCaseId">CASE-DEL-2026-089</div>
+              </div>
+              <h2 class="dossier-title" id="dashCaseTitle">THE MIDNIGHT MURDER</h2>
+              <div class="dossier-meta">
+                <span><strong>LOCATION:</strong> <span id="dashCaseLocation">Bungalow 14-B, Amrita Shergill Marg, New Delhi</span></span>
+                <span><strong>DATE/TIME:</strong> <span id="dashCaseTime">2026-10-14 23:45 IST</span></span>
+                <span><strong>INVESTIGATOR:</strong> <span id="dashCaseOfficer">Inspector General A. K. Shrivastava</span></span>
+                <span><strong>VICTIM:</strong> <span id="dashCaseVictim">Vikramaditya Singhania (Age 54, Industrialist)</span></span>
+              </div>
+              <p class="dossier-desc" id="dashCaseDesc">
+                Fictional homicide investigation into the demise of Vikramaditya Singhania (54), industrialist and art patron, found deceased in his ground-floor private study. Preliminary forensic post-mortem indicates fatal cranial blunt-force trauma occurring between 23:30 and 00:15 IST.
+              </p>
+              <div class="dossier-actions">
+                <button class="btn btn-sm btn-outline" onclick="window.culpritApp.switchTab('tab-suspects')">Inspect Suspects</button>
+                <button class="btn btn-sm btn-outline" onclick="window.culpritApp.switchTab('tab-evidence')">View Evidence Board</button>
+                <button class="btn btn-sm btn-danger" onclick="window.culpritApp.openSolveModal()">Execute Full Algorithmic Solve</button>
+              </div>
+            </div>
+
+            <!-- Suspect Risk & Evidence Ranking (Calculated by Merge Sort) -->
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                  SUSPECT EVIDENCE RANKING &bull; MERGE SORT ENGINE
+                </div>
+                <button class="btn btn-xs btn-outline" onclick="window.culpritApp.runMergeSortTab()">Run Merge Sort</button>
+              </div>
+              <div class="panel-body">
+                <div class="table-responsive">
+                  <table class="data-table" id="dashboardSuspectTable">
+                    <thead>
+                      <tr>
+                        <th>RANK</th>
+                        <th>SUSPECT NAME</th>
+                        <th>OCCUPATION</th>
+                        <th>ALIBI STATUS</th>
+                        <th>EVIDENCE SCORE</th>
+                        <th>ACTION</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dashSuspectTableBody">
+                      <!-- Rendered dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Recent Activity Feed & Clues Timeline -->
+          <div class="grid-col-right">
+            <!-- Empirical Clues Verification Card -->
+            <div class="panel mb-4">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  CASE CLUES & CONSTRAINT CSP
+                </div>
+                <span class="badge-tag" id="dashClueCountBadge">6 Clues</span>
+              </div>
+              <div class="panel-body">
+                <div class="clue-list" id="dashCluesList">
+                  <!-- Injected dynamically -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Activity Log -->
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                  FORENSIC ACTIVITY FEED
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="timeline" id="dashActivityTimeline">
+                  <!-- Injected dynamically -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 2: CASE MANAGEMENT -->
+      <!-- ============================================================== -->
+      <section id="tab-cases" class="tab-pane">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">CASE REPOSITORY & MANAGEMENT</h1>
+            <p class="view-subtitle">Register new crime files, edit existing investigations, and switch active jurisdictions.</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn btn-primary" onclick="window.culpritApp.openNewCaseModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Register New Case
+            </button>
+          </div>
+        </div>
+
+        <div class="cases-grid" id="casesGridContainer">
+          <!-- Rendered dynamically -->
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 3: SUSPECT MANAGEMENT & COMPARISON -->
+      <!-- ============================================================== -->
+      <section id="tab-suspects" class="tab-pane">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">SUSPECT DOSSIERS & COMPARISON MATRIX</h1>
+            <p class="view-subtitle">Detailed profiles, alibi tracking, opportunity analysis, and side-by-side clue evaluation.</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn btn-secondary" onclick="window.culpritApp.openNewSuspectModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Suspect
+            </button>
+            <button class="btn btn-primary" onclick="window.culpritApp.runSuspectComparison()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Compare All Suspects
+            </button>
+          </div>
+        </div>
+
+        <!-- Linear Search Toolbar for Suspects -->
+        <div class="search-toolbar mb-4">
+          <div class="search-input-group">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="suspectSearchInput" placeholder="Search suspects by name, occupation, status, or alibi (C++ Linear Search)..." onkeyup="if(event.key==='Enter') window.culpritApp.executeSuspectSearch()">
+          </div>
+          <select id="suspectSearchField">
+            <option value="all">All Fields</option>
+            <option value="name">Name Only</option>
+            <option value="occupation">Occupation</option>
+            <option value="status">Status</option>
+          </select>
+          <button class="btn btn-outline" onclick="window.culpritApp.executeSuspectSearch()">Execute Linear Search</button>
+        </div>
+
+        <!-- Suspect Cards List -->
+        <div class="suspects-grid" id="suspectsListContainer">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- Suspect Comparison Matrix Section -->
+        <div class="panel mt-6">
+          <div class="panel-header">
+            <div class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+              SIDE-BY-SIDE FORENSIC COMPARISON MATRIX
+            </div>
+            <span class="badge-tag">Empirical Constraint Comparison</span>
+          </div>
+          <div class="panel-body">
+            <div class="table-responsive">
+              <table class="data-table" id="suspectComparisonTable">
+                <thead>
+                  <tr id="comparisonTableHeader">
+                    <th>ATTRIBUTE / CRITERIA</th>
+                    <!-- Suspect Columns injected -->
+                  </tr>
+                </thead>
+                <tbody id="comparisonTableBody">
+                  <!-- Rows injected -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 4: EVIDENCE MANAGEMENT -->
+      <!-- ============================================================== -->
+      <section id="tab-evidence" class="tab-pane">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">FORENSIC EVIDENCE PINBOARD</h1>
+            <p class="view-subtitle">Forensic classification, chain of custody verification, and reliability weighted ranking.</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn btn-secondary" onclick="window.culpritApp.openNewEvidenceModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Collect New Evidence
+            </button>
+          </div>
+        </div>
+
+        <!-- Evidence Search & Filter Toolbar -->
+        <div class="search-toolbar mb-4">
+          <div class="search-input-group">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="evidenceSearchInput" placeholder="Search evidence items (C++ Linear Search)..." onkeyup="if(event.key==='Enter') window.culpritApp.executeEvidenceSearch()">
+          </div>
+          <select id="evidenceCategoryFilter" onchange="window.culpritApp.filterEvidenceByCategory(this.value)">
+            <option value="ALL">All Categories</option>
+            <option value="Physical Evidence">Physical Evidence</option>
+            <option value="Digital Evidence">Digital Evidence</option>
+            <option value="Witness Evidence">Witness Evidence</option>
+            <option value="Documentary Evidence">Documentary Evidence</option>
+            <option value="Circumstantial Evidence">Circumstantial Evidence</option>
+          </select>
+          <button class="btn btn-outline" onclick="window.culpritApp.executeEvidenceSearch()">Execute Linear Search</button>
+        </div>
+
+        <!-- Realistic Evidence Pinboard Grid -->
+        <div class="evidence-pinboard" id="evidenceGridContainer">
+          <!-- Rendered dynamically -->
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 5: WITNESS STATEMENTS & KMP ANALYZER -->
+      <!-- ============================================================== -->
+      <section id="tab-witnesses" class="tab-pane">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">WITNESS DEPOSITIONS & KMP STRING SEARCH</h1>
+            <p class="view-subtitle">High-speed Knuth-Morris-Pratt pattern matching engine with Pi prefix function table inspection.</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn btn-secondary" onclick="window.culpritApp.openNewWitnessModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Record Deposition
+            </button>
+          </div>
+        </div>
+
+        <!-- KMP Interactive Search Console -->
+        <div class="panel mb-5">
+          <div class="panel-header">
+            <div class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              KMP PATTERN INSPECTOR &bull; TRANSCRIPT ANALYSIS ENGINE
+            </div>
+            <span class="badge-tag">Linear Time O(N + M) Guaranteed</span>
+          </div>
+          <div class="panel-body">
+            <div class="kmp-input-row">
+              <div class="form-group flex-1">
+                <label>Target Witness Deposition:</label>
+                <select id="kmpWitnessSelector">
+                  <!-- Injected dynamically -->
+                </select>
+              </div>
+              <div class="form-group flex-2">
+                <label>Forensic Keyword / Search Phrase:</label>
+                <div class="input-with-button">
+                  <input type="text" id="kmpPatternInput" value="dark grey sedan" placeholder="Enter keyword (e.g. 'shattered glass', 'navy cashmere', 'sedan')...">
+                  <button class="btn btn-danger" onclick="window.culpritApp.executeKmpSearch()">Execute KMP Search</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- KMP Results Preview Box -->
+            <div id="kmpResultContainer" style="display: none;" class="mt-4">
+              <div class="kmp-metrics-bar" id="kmpMetricsBar">
+                <!-- Metrics injected -->
+              </div>
+
+              <!-- LPS Table -->
+              <div class="lps-display mt-3">
+                <div class="label-heading">PRECOMPUTED KMP PREFIX FUNCTION TABLE (&Pi; / LPS ARRAY):</div>
+                <div class="lps-table-wrapper" id="kmpLpsTableWrapper"></div>
+              </div>
+
+              <!-- Highlighted Transcript Context -->
+              <div class="transcript-display mt-3">
+                <div class="label-heading">MATCH OCCURRENCES IN TRANSCRIPT:</div>
+                <div class="transcript-box" id="kmpTranscriptBox"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Witness Statements Cards List -->
+        <div class="witness-list" id="witnessListContainer">
+          <!-- Rendered dynamically -->
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 6: INTERACTIVE INVESTIGATION GRAPH -->
+      <!-- ============================================================== -->
+      <section id="tab-graph" class="tab-pane">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">INTERACTIVE RELATIONSHIP NETWORK GRAPH</h1>
+            <p class="view-subtitle">Full topological adjacency network mapping Suspects, Victims, Witnesses, Evidence, and Scenes.</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn btn-outline btn-sm" onclick="window.graphEngine.resetZoom()">Reset Camera</button>
+            <button class="btn btn-secondary btn-sm" onclick="window.culpritApp.runBfsFromSelected()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+              Run BFS Traversal
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="window.culpritApp.runDfsFromSelected()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              Run DFS Deep Probe
+            </button>
+          </div>
+        </div>
+
+        <!-- Graph Workspace Layout -->
+        <!-- Shortest Proof Path Finder Toolbar -->
+        <div class="search-toolbar mb-3" style="align-items: center;">
+          <span class="label text-xs">SHORTEST EVIDENTIARY PROOF CHAIN:</span>
+          <select id="proofPathSuspectSelect">
+            <!-- Injected -->
+          </select>
+          <span class="text-dim">&rarr;</span>
+          <span class="badge-tag">VICTIM</span>
+          <button class="btn btn-sm btn-primary" onclick="window.culpritApp.findProofPath()">Trace Proof Chain</button>
+          <span id="proofPathSummary" class="text-xs text-accent ml-2"></span>
+        </div>
+
+        <div class="graph-workspace">
+          <!-- Graph Canvas Container -->
+          <div class="graph-canvas-container" id="graphCanvasWrapper">
+            <canvas id="investigationGraphCanvas"></canvas>
+            <!-- Canvas Overlay Legend -->
+            <div class="graph-legend">
+              <span class="legend-item"><span class="legend-dot dot-victim"></span> Victim</span>
+              <span class="legend-item"><span class="legend-dot dot-suspect"></span> Suspect</span>
+              <span class="legend-item"><span class="legend-dot dot-witness"></span> Witness</span>
+              <span class="legend-item"><span class="legend-dot dot-evidence"></span> Evidence</span>
+              <span class="legend-item"><span class="legend-dot dot-location"></span> Scene</span>
+            </div>
+          </div>
+
+          <!-- Node Detail Inspector Sidebar -->
+          <div class="graph-inspector" id="graphNodeInspector">
+            <div class="inspector-header">
+              <span class="inspector-badge" id="inspectorNodeType">ENTITY INSPECTOR</span>
+              <h3 class="inspector-title" id="inspectorNodeLabel">Select Any Node</h3>
+            </div>
+            <div class="inspector-body">
+              <p class="inspector-desc" id="inspectorNodeDetails">
+                Click on any node in the canvas to examine relational connections, evidence scores, and run BFS / DFS pathfinding.
+              </p>
+              <div class="inspector-meta" id="inspectorNodeMeta"></div>
+              
+              <div class="inspector-actions mt-4">
+                <button class="btn btn-sm btn-outline w-100 mb-2" onclick="window.culpritApp.setBfsRootFromInspector()">Set as BFS Root</button>
+                <button class="btn btn-sm btn-outline w-100" onclick="window.culpritApp.setDfsRootFromInspector()">Set as DFS Root</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Adjacency Matrix vs Adjacency List Memory Analysis -->
+        <div class="panel mt-4">
+          <div class="panel-header">
+            <div class="panel-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+              DATA STRUCTURE OPTIMIZATION &bull; ADJACENCY LIST VS ADJACENCY MATRIX (MEMORY COMPARISON)
+            </div>
+            <span class="badge-tag">Academic Complexity Proof</span>
+          </div>
+          <div class="panel-body" id="graphMemoryAnalysisBody">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-info">
+                  <div class="stat-label">VERTEX COUNT (|V|)</div>
+                  <div class="stat-value" id="memVertexCount">19</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-info">
+                  <div class="stat-label">EDGE COUNT (|E|)</div>
+                  <div class="stat-value" id="memEdgeCount">38</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-info">
+                  <div class="stat-label">GRAPH DENSITY (&rho;)</div>
+                  <div class="stat-value text-accent" id="memDensity">22.2%</div>
+                  <div class="stat-sub">Sparse Network</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-info">
+                  <div class="stat-label">ADJACENCY LIST RAM</div>
+                  <div class="stat-value" id="memAdjListBytes">2,880 B</div>
+                  <div class="stat-sub">O(V + E) Space</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-info">
+                  <div class="stat-label">ADJACENCY MATRIX RAM</div>
+                  <div class="stat-value text-dim" id="memAdjMatrixBytes">3,040 B</div>
+                  <div class="stat-sub">O(V&sup2;) Space</div>
+                </div>
+              </div>
+            </div>
+            <div class="algo-summary-box mt-3" id="memRecommendationBox">
+              <strong>ACADEMIC ARCHITECTURAL JUSTIFICATION:</strong> In police criminal networks, entities form sparse clusters rather than complete graphs (|E| &ll; |V|&sup2;). The Adjacency List representation guarantees optimal O(V + E) traversal efficiency for Breadth-First and Depth-First Search without paying the quadratic O(V&sup2;) space and initialization penalty.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 7: DSA ENGINE CONSOLE & STEP LOGS -->
+      <!-- ============================================================== -->
+      <section id="tab-algorithms" class="tab-pane">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">ALGORITHM ENGINE EXECUTION CONSOLE</h1>
+            <p class="view-subtitle">Inspect the inner workings of all C++ algorithms: input data, state transitions, step counters, and complexities.</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn btn-danger" onclick="window.culpritApp.runAllAlgorithmsDiagnostic()">
+              Run Full Diagnostic Suite
+            </button>
+          </div>
+        </div>
+
+        <!-- Algorithm Selection Pills -->
+        <div class="algo-nav-pills mb-4">
+          <button class="algo-pill active" onclick="window.culpritApp.showAlgoDetails('merge_sort')">Merge Sort (Suspects)</button>
+          <button class="algo-pill" onclick="window.culpritApp.showAlgoDetails('backtracking')">Backtracking (CSP Clues)</button>
+          <button class="algo-pill" onclick="window.culpritApp.showAlgoDetails('bfs')">BFS (Network Traversal)</button>
+          <button class="algo-pill" onclick="window.culpritApp.showAlgoDetails('dfs')">DFS (Deep Relations)</button>
+          <button class="algo-pill" onclick="window.culpritApp.showAlgoDetails('kmp')">KMP String Matcher</button>
+          <button class="algo-pill" onclick="window.culpritApp.showAlgoDetails('linear_search')">Linear Search</button>
+        </div>
+
+        <!-- Algorithm Inspector Card -->
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title" id="algoInspectorTitle">Merge Sort (Divide-and-Conquer)</div>
+              <div class="text-muted text-xs" id="algoInspectorSubtitle">Sorts suspects according to their calculated composite evidence relevance scores.</div>
+            </div>
+            <div class="algo-complexity-tags" id="algoComplexityTags">
+              <span class="complexity-badge">Best: O(N log N)</span>
+              <span class="complexity-badge">Worst: O(N log N)</span>
+              <span class="complexity-badge">Space: O(N)</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <!-- Stats / Execution Summary -->
+            <div class="algo-summary-box mb-3" id="algoSummaryBox">
+              Executing algorithm on current case dataset...
+            </div>
+
+            <!-- Interactive Step-Through Player Controls -->
+            <div class="stepper-controls mb-4">
+              <div class="stepper-buttons">
+                <button class="btn btn-xs btn-outline" onclick="window.algoVisualizer.firstStep()">⏮ First</button>
+                <button class="btn btn-xs btn-outline" onclick="window.algoVisualizer.prevStep()">◀ Prev Step</button>
+                <button class="btn btn-xs btn-danger" id="algoPlayBtn" onclick="window.algoVisualizer.togglePlay()">▶ Auto-Play</button>
+                <button class="btn btn-xs btn-outline" onclick="window.algoVisualizer.nextStep()">Next Step ▶</button>
+                <button class="btn btn-xs btn-outline" onclick="window.algoVisualizer.lastStep()">Last ⏭</button>
+              </div>
+              <div class="stepper-slider-wrapper">
+                <span class="stepper-indicator" id="algoStepCounter">Step 1 of 1</span>
+                <input type="range" id="algoStepSlider" min="1" max="1" value="1" oninput="window.algoVisualizer.goToStep(parseInt(this.value))">
+              </div>
+            </div>
+
+            <!-- Trace Step Logs Table -->
+            <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
+              <table class="data-table" id="algoStepLogsTable">
+                <thead>
+                  <tr id="algoStepHeader">
+                    <th>STEP #</th>
+                    <th>ACTION / PHASE</th>
+                    <th>CANDIDATE / DETAILS</th>
+                    <th>EVALUATION</th>
+                    <th>NOTES & STATE LOG</th>
+                  </tr>
+                </thead>
+                <tbody id="algoStepBody">
+                  <!-- Steps injected dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 8: C++ ARCHITECTURE & CODE INSPECTOR -->
+      <!-- ============================================================== -->
+      <section id="tab-cpp-code" class="tab-pane">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">C++17 ALGORITHMIC ENGINE &bull; SOURCE CODE & PROOFS</h1>
+            <p class="view-subtitle">Review the native C++17 implementations, memory layouts, recurrence relations, and Big-O proofs for academic verification.</p>
+          </div>
+          <div class="view-actions">
+            <span class="badge-tag">ISO C++17 Standard &bull; Zero External Packages</span>
+          </div>
+        </div>
+
+        <div class="algo-nav-pills mb-4">
+          <button class="algo-pill active" onclick="window.culpritApp.showCppSource('merge_sort')">MergeSort.hpp (O(N log N))</button>
+          <button class="algo-pill" onclick="window.culpritApp.showCppSource('backtracking')">Backtracking.hpp (CSP Clues)</button>
+          <button class="algo-pill" onclick="window.culpritApp.showCppSource('bfs')">Graph.hpp (BFS Traversal)</button>
+          <button class="algo-pill" onclick="window.culpritApp.showCppSource('kmp')">KMP.hpp (Linear Search)</button>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="grid-col-left">
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                  <span id="cppCodeHeaderTitle">src/core/MergeSort.hpp</span>
+                </div>
+                <span class="badge-tag">C++17 STL Vector</span>
+              </div>
+              <div class="panel-body" style="padding: 0;">
+                <pre class="code-editor" id="cppSourceCodeDisplay">Loading C++ implementation...</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-col-right">
+            <!-- Academic Complexity Proof Panel -->
+            <div class="panel mb-4">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  RECURRENCE & COMPLEXITY PROOF
+                </div>
+              </div>
+              <div class="panel-body" id="cppProofExplanation">
+                <div class="text-sm" style="line-height: 1.6;">
+                  <strong class="text-accent">Recurrence Relation:</strong><br>
+                  <code>T(N) = 2T(N/2) + &Theta;(N)</code><br><br>
+                  By <strong>Master Theorem (Case 2)</strong>, where <code>a = 2, b = 2, f(N) = &Theta;(N)</code>:<br>
+                  <code>c = log_b(a) = log_2(2) = 1</code>.<br>
+                  Since <code>f(N) = &Theta;(N^c) = &Theta;(N^1)</code>, the overall time complexity is strictly:<br>
+                  <strong class="text-accent">T(N) = &Theta;(N log N)</strong> in Best, Worst, and Average cases.<br><br>
+                  <strong>Space Complexity:</strong> <code>O(N)</code> auxiliary buffer allocated during partition merges.
+                </div>
+              </div>
+            </div>
+
+            <!-- Memory Overhead Card -->
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  CACHE LOCALITY & SYSTEM ARCHITECTURE
+                </div>
+              </div>
+              <div class="panel-body">
+                <ul class="text-xs text-muted" style="list-style: square; padding-left: 1.25rem; line-height: 1.7;">
+                  <li><strong>Contiguous Memory:</strong> <code>std::vector</code> stores suspect records sequentially in memory, ensuring hardware cache-line prefetching (L1/L2 cache hits).</li>
+                  <li><strong>Zero Runtime Dependencies:</strong> Written with standard ISO C++17 library structures (`unordered_map`, `queue`, `vector`, `chrono`).</li>
+                  <li><strong>Deterministic Verification:</strong> Eliminates non-deterministic heuristics; all clues resolve deterministically via graph reachability and constraint satisfaction.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 8: INVESTIGATION REPORT & PDF EXPORT -->
+      <!-- ============================================================== -->
+      <section id="tab-report" class="tab-pane">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">OFFICIAL FORENSIC INVESTIGATION DOSSIER</h1>
+            <p class="view-subtitle">Comprehensive courtroom-ready report synthesizing all evidentiary and algorithmic findings.</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn btn-secondary" onclick="window.culpritApp.generateReport()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              Regenerate Dossier
+            </button>
+            <button class="btn btn-primary" onclick="window.print()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              Export PDF / Print Dossier
+            </button>
+          </div>
+        </div>
+
+        <!-- Printable Official Forensic Report Paper Layout -->
+        <div class="report-paper-container">
+          <div class="report-paper" id="printableDossierReport">
+            <!-- Official Header -->
+            <div class="report-official-header">
+              <div class="report-crest">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/>
+                  <path d="M12 8v5"/><circle cx="12" cy="16" r="1"/>
+                </svg>
+              </div>
+              <div class="report-agency-details">
+                <div class="agency-title">DIRECTORATE OF FORENSIC CRIMINOLOGY &bull; CRIME BRANCH</div>
+                <div class="agency-subtitle">SPECIAL INVESTIGATION TEAM (SIT) &bull; ALGORITHMIC TRIAGE REPORT</div>
+                <div class="agency-confidential">CLASSIFICATION: STRICTLY CONFIDENTIAL &bull; FOR JUDICIAL & INVESTIGATIVE USE ONLY</div>
+              </div>
+              <div class="report-stamp-box">
+                <div class="stamp-classified">OFFICIAL DOSSIER</div>
+              </div>
+            </div>
+
+            <hr class="report-divider">
+
+            <!-- Report Meta Grid -->
+            <div class="report-meta-grid">
+              <div><strong>CASE FILE ID:</strong> <span id="repCaseId">CASE-DEL-2026-089</span></div>
+              <div><strong>CRIME CLASSIFICATION:</strong> <span id="repCrimeType">Homicide</span></div>
+              <div><strong>DATE & TIME OF OCCURRENCE:</strong> <span id="repDateTime">2026-10-14 23:45 IST</span></div>
+              <div><strong>PRIMARY CRIME SCENE:</strong> <span id="repLocation">Bungalow 14-B, Amrita Shergill Marg, New Delhi</span></div>
+              <div><strong>SUPERVISING INVESTIGATOR:</strong> <span id="repOfficer">Inspector General A. K. Shrivastava</span></div>
+              <div><strong>DECEASED VICTIM:</strong> <span id="repVictim">Vikramaditya Singhania (Age 54)</span></div>
+            </div>
+
+            <!-- Section 1: Executive Case Synopsis -->
+            <div class="report-section">
+              <h3 class="report-sec-title">1. EXECUTIVE CASE SYNOPSIS</h3>
+              <p class="report-paragraph" id="repSynopsis">
+                Fictional homicide investigation into the demise of Vikramaditya Singhania (54), industrialist and art patron, found deceased in his ground-floor private study. Preliminary forensic post-mortem indicates fatal cranial blunt-force trauma occurring between 23:30 and 00:15 IST, coupled with chemical incapacitation traces in a half-empty brandy decanter.
+              </p>
+            </div>
+
+            <!-- Section 2: Algorithmic Merge Sort Suspect Ranking -->
+            <div class="report-section">
+              <h3 class="report-sec-title">2. ALGORITHMIC SUSPECT RANKING (MERGE SORT O(N log N))</h3>
+              <table class="report-table">
+                <thead>
+                  <tr>
+                    <th>RANK</th>
+                    <th>SUSPECT NAME</th>
+                    <th>AGE / OCCUPATION</th>
+                    <th>COMPOSITE SCORE</th>
+                    <th>ALIBI VALIDITY</th>
+                    <th>INVESTIGATION STATUS</th>
+                  </tr>
+                </thead>
+                <tbody id="repSuspectTableBody">
+                  <!-- Injected -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Section 3: Backtracking Constraint Satisfaction & Clue Elimination -->
+            <div class="report-section">
+              <h3 class="report-sec-title">3. CONSTRAINT SATISFACTION CLUE ELIMINATION (BACKTRACKING CSP)</h3>
+              <p class="report-paragraph">
+                The C++ Backtracking Engine evaluated all registered candidates against the 6 empirical case clues (Time Window, Weapon Access, Forensic Biological Match, Alibi Verification, Financial Motive, and Direct Scene Trace). Inconsistent hypotheses were pruned at decision branch nodes.
+              </p>
+              <div class="clue-match-box" id="repMatchingBox">
+                <!-- Injected matching suspects -->
+              </div>
+            </div>
+
+            <!-- Section 4: Physical & Digital Evidence Inventory -->
+            <div class="report-section">
+              <h3 class="report-sec-title">4. FORENSIC EVIDENCE INVENTORY</h3>
+              <table class="report-table">
+                <thead>
+                  <tr>
+                    <th>EVIDENCE ID</th>
+                    <th>EVIDENCE DESCRIPTION</th>
+                    <th>CATEGORY</th>
+                    <th>RELIABILITY</th>
+                    <th>CHAIN OF CUSTODY</th>
+                  </tr>
+                </thead>
+                <tbody id="repEvidenceTableBody">
+                  <!-- Injected -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Section 5: Witness Depositions & KMP Analysis -->
+            <div class="report-section">
+              <h3 class="report-sec-title">5. WITNESS STATEMENTS & KMP KEYWORD EXTRACTION</h3>
+              <div id="repWitnessSummary">
+                <!-- Injected -->
+              </div>
+            </div>
+
+            <!-- Section 6: Network Graph Analysis -->
+            <div class="report-section">
+              <h3 class="report-sec-title">6. RELATIONAL NETWORK TOPOLOGY (BFS & DFS SYNTHESIS)</h3>
+              <p class="report-paragraph" id="repNetworkSummary">
+                Network breadth-first search established 19 interconnected entities with a maximum diameter of 3 degrees of separation from the victim.
+              </p>
+            </div>
+
+            <!-- Section 7: Final Simulated Findings & Legal Disclaimer -->
+            <div class="report-section">
+              <h3 class="report-sec-title">7. FINAL SIMULATED FINDINGS & ADVISORY</h3>
+              <div class="simulated-findings-box" id="repFinalFindings">
+                <!-- Injected -->
+              </div>
+              <div class="legal-disclaimer-box mt-3" id="repLegalDisclaimer">
+                EDUCATIONAL FORENSIC SIMULATION: Matching candidates represent persons of high investigative interest who satisfy all empirical constraints. In accordance with evidentiary standards, algorithmic match does not constitute judicial determination of criminal guilt.
+              </div>
+            </div>
+
+            <!-- Signature Block -->
+            <div class="report-signatures">
+              <div class="sig-block">
+                <div class="sig-line">A. K. Shrivastava</div>
+                <div class="sig-role">SUPERVISING INVESTIGATOR<br>Badge #7412</div>
+              </div>
+              <div class="sig-block">
+                <div class="sig-line">Dr. V. K. Malhotra</div>
+                <div class="sig-role">CHIEF FORENSIC EXAMINER<br>FSL Rohini</div>
+              </div>
+              <div class="sig-block">
+                <div class="sig-line">System Algorithmic Attestation</div>
+                <div class="sig-role">C++17 CULPRIT ENGINE VERIFIED<br>Deterministic Hash Validated</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Modal Dialog: Case Solver Execution -->
+  <div class="modal-backdrop" id="solverModal">
+    <div class="modal-box modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title">WHO IS THE CULPRIT? &bull; FORENSIC SOLVER</h3>
+        <button class="modal-close" onclick="window.culpritApp.closeSolveModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="solverModalBody">
+        <div class="solver-executing text-center py-6">
+          <div class="spinner mb-3"></div>
+          <h4>Executing C++17 Multi-Algorithm Pipeline...</h4>
+          <p class="text-muted text-sm">Evaluating Merge Sort, CSP Backtracking, Graph BFS/DFS, and KMP String Matching.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="window.culpritApp.closeSolveModal()">Close</button>
+        <button class="btn btn-primary" onclick="window.culpritApp.viewFullReportFromSolver()">Open Full Investigation Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Dialog: Add New Suspect -->
+  <div class="modal-backdrop" id="newSuspectModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">REGISTER NEW SUSPECT</h3>
+        <button class="modal-close" onclick="window.culpritApp.closeModal('newSuspectModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="newSuspectForm" onsubmit="window.culpritApp.submitNewSuspect(event)">
+          <div class="form-group mb-3">
+            <label>Full Name:</label>
+            <input type="text" id="suspName" required placeholder="e.g. Ramesh Varma">
+          </div>
+          <div class="form-row mb-3">
+            <div class="form-group flex-1">
+              <label>Age:</label>
+              <input type="number" id="suspAge" value="35" required>
+            </div>
+            <div class="form-group flex-2">
+              <label>Occupation:</label>
+              <input type="text" id="suspOccupation" required placeholder="e.g. Financial Consultant">
+            </div>
+          </div>
+          <div class="form-group mb-3">
+            <label>Relationship to Victim:</label>
+            <input type="text" id="suspRelationship" required placeholder="e.g. Business Associate / Disgruntled Creditor">
+          </div>
+          <div class="form-group mb-3">
+            <label>Claimed Alibi:</label>
+            <textarea id="suspAlibi" rows="2" required placeholder="Claimed whereabouts during critical time window..."></textarea>
+          </div>
+          <div class="form-group mb-3">
+            <label>Motive:</label>
+            <input type="text" id="suspMotive" required placeholder="Financial gain, revenge, blackmail...">
+          </div>
+          <div class="form-group mb-3">
+            <label>Opportunity:</label>
+            <input type="text" id="suspOpportunity" required placeholder="Access to premises, knowledge of schedule...">
+          </div>
+          <div class="form-checkboxes mb-3">
+            <label><input type="checkbox" id="suspPresence"> Present in Time Window</label>
+            <label><input type="checkbox" id="suspWeaponAccess"> Had Weapon / Means Access</label>
+            <label><input type="checkbox" id="suspForensicMatch"> Forensic Trace Matched</label>
+            <label><input type="checkbox" id="suspAlibiVerified"> Alibi Independently Verified</label>
+          </div>
+          <div class="text-right">
+            <button type="button" class="btn btn-secondary mr-2" onclick="window.culpritApp.closeModal('newSuspectModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Suspect Dossier</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Dialog: Add New Evidence -->
+  <div class="modal-backdrop" id="newEvidenceModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">REGISTER FORENSIC EVIDENCE</h3>
+        <button class="modal-close" onclick="window.culpritApp.closeModal('newEvidenceModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="newEvidenceForm" onsubmit="window.culpritApp.submitNewEvidence(event)">
+          <div class="form-group mb-3">
+            <label>Evidence Name / Title:</label>
+            <input type="text" id="evName" required placeholder="e.g. Latent Fingerprint on Flute">
+          </div>
+          <div class="form-row mb-3">
+            <div class="form-group flex-1">
+              <label>Category:</label>
+              <select id="evCategory">
+                <option value="Physical">Physical Evidence</option>
+                <option value="Digital">Digital Evidence</option>
+                <option value="Witness">Witness Evidence</option>
+                <option value="Documentary">Documentary Evidence</option>
+                <option value="Circumstantial">Circumstantial Evidence</option>
+              </select>
+            </div>
+            <div class="form-group flex-1">
+              <label>Reliability Score (0-100%):</label>
+              <input type="number" id="evReliability" min="10" max="100" value="90" required>
+            </div>
+          </div>
+          <div class="form-group mb-3">
+            <label>Description & Forensic Findings:</label>
+            <textarea id="evDescription" rows="2" required placeholder="Detailed forensic laboratory analysis..."></textarea>
+          </div>
+          <div class="form-group mb-3">
+            <label>Collection Location:</label>
+            <input type="text" id="evLocation" required placeholder="e.g. West Garden French Window Latch">
+          </div>
+          <div class="form-group mb-3">
+            <label>Linked Suspect ID (Optional):</label>
+            <select id="evLinkedSuspect">
+              <option value="">-- No Direct Suspect Link --</option>
+            </select>
+          </div>
+          <div class="text-right">
+            <button type="button" class="btn btn-secondary mr-2" onclick="window.culpritApp.closeModal('newEvidenceModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Record Evidence in Chain of Custody</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Dialog: Add New Witness Statement -->
+  <div class="modal-backdrop" id="newWitnessModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">RECORD WITNESS DEPOSITION</h3>
+        <button class="modal-close" onclick="window.culpritApp.closeModal('newWitnessModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="newWitnessForm" onsubmit="window.culpritApp.submitNewWitness(event)">
+          <div class="form-group mb-3">
+            <label>Witness Name:</label>
+            <input type="text" id="witName" required placeholder="e.g. Inspector Suresh Kumar">
+          </div>
+          <div class="form-row mb-3">
+            <div class="form-group flex-1">
+              <label>Occupation / Role:</label>
+              <input type="text" id="witOccupation" required placeholder="e.g. Neighbor / Security Staff">
+            </div>
+            <div class="form-group flex-1">
+              <label>Credibility Rating (0-100%):</label>
+              <input type="number" id="witCredibility" min="10" max="100" value="90" required>
+            </div>
+          </div>
+          <div class="form-group mb-3">
+            <label>Relationship to Case:</label>
+            <input type="text" id="witRelation" required placeholder="e.g. Present at entrance during critical hour">
+          </div>
+          <div class="form-group mb-3">
+            <label>Deposition Statement Text:</label>
+            <textarea id="witStatement" rows="4" required placeholder="Transcribed verbatim statement given under oath..."></textarea>
+          </div>
+          <div class="text-right">
+            <button type="button" class="btn btn-secondary mr-2" onclick="window.culpritApp.closeModal('newWitnessModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary">File Witness Deposition</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/graph.js"></script>
+  <script src="js/algorithms.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# Binaries and build artifacts
+build/
+culprit_engine
+*.o
+*.dSYM/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
